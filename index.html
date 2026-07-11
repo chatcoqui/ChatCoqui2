@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#0A1628" />
+  <title>ChatCoquí — Tu IA Hispana 🐸</title>
+  <meta name="description" content="Tu asistente de inteligencia artificial bilingüe para toda la comunidad hispana." />
+  <meta property="og:title" content="ChatCoquí — Tu IA Hispana 🐸" />
+  <meta property="og:description" content="Tu IA Hispana bilingüe. Boricua de corazón. Ko-kí ko-kí!" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐸</text></svg>" />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Fraunces:wght@700;900&family=Source+Sans+3:wght@300;400;600;700&display=swap');
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; overflow: hidden; background: #0A1628; }
+    ::-webkit-scrollbar { width: 3px; }
+    ::-webkit-scrollbar-thumb { background: rgba(245,166,35,0.25); border-radius: 2px; }
+
+    #app { display: flex; flex-direction: column; height: 100vh; background: linear-gradient(155deg, #0A1628 0%, #0F2117 45%, #160A1E 100%); font-family: 'Source Sans 3', sans-serif; }
+
+    /* Header */
+    #header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,0.07); background: rgba(10,22,40,0.85); backdrop-filter: blur(24px); flex-shrink: 0; }
+    #logo { display: flex; align-items: center; gap: 10px; }
+    #frog-icon { width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(135deg, #27AE60, #1ABC9C); display: flex; align-items: center; justify-content: center; font-size: 20px; box-shadow: 0 3px 18px rgba(39,174,96,0.45); animation: floatFrog 4s ease-in-out infinite; flex-shrink: 0; }
+    #title { font-family: 'Fraunces', serif; font-size: 1.35rem; font-weight: 900; color: #F0EAD6; letter-spacing: -0.02em; line-height: 1; }
+    #title span { color: #27AE60; }
+    #subtitle { font-size: 0.65rem; color: rgba(240,234,214,0.4); letter-spacing: 0.1em; text-transform: uppercase; margin-top: 2px; }
+    #controls { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+    #lang-btn, #clear-btn { border-radius: 16px; padding: 5px 11px; font-family: 'Source Sans 3', sans-serif; font-size: 0.75rem; font-weight: 600; cursor: pointer; border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.07); color: #F0EAD6; transition: all 0.2s; }
+    #clear-btn { background: rgba(192,57,43,0.12); border-color: rgba(192,57,43,0.25); color: rgba(240,150,130,0.9); display: none; }
+    #online { display: flex; align-items: center; gap: 4px; }
+    #online-dot { width: 7px; height: 7px; border-radius: 50%; background: #2ECC71; box-shadow: 0 0 8px #2ECC71; animation: pulse 2s infinite; }
+    #online-text { font-size: 0.7rem; color: rgba(240,234,214,0.4); }
+
+    /* Flag strip */
+    #flags { background: rgba(0,0,0,0.25); border-bottom: 1px solid rgba(255,255,255,0.05); overflow: hidden; height: 28px; display: flex; align-items: center; flex-shrink: 0; }
+    #flags-inner { display: flex; gap: 14px; animation: scrollFlags 28s linear infinite; white-space: nowrap; font-size: 0.85rem; }
+    #flags-inner span { opacity: 0.7; }
+
+    /* Chat area */
+    #chat { flex: 1; overflow-y: auto; padding: 20px 14px; display: flex; flex-direction: column; }
+
+    /* Welcome */
+    #welcome { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; text-align: center; padding: 20px 14px; animation: fadeIn 0.4s ease-out; }
+    #welcome-frog { font-size: 60px; margin-bottom: 14px; animation: floatFrog 3.5s ease-in-out infinite; filter: drop-shadow(0 8px 28px rgba(39,174,96,0.35)); }
+    #welcome h2 { font-family: 'Fraunces', serif; font-size: clamp(1.4rem, 4vw, 2rem); font-weight: 900; color: #F0EAD6; margin-bottom: 10px; line-height: 1.15; }
+    #welcome h2 span { color: #27AE60; }
+    #greeting { font-size: 0.95rem; color: rgba(240,234,214,0.65); max-width: 420px; line-height: 1.7; margin-bottom: 6px; }
+    #tagline { font-size: 0.78rem; color: rgba(240,234,214,0.35); max-width: 380px; line-height: 1.6; margin-bottom: 20px; font-style: italic; }
+
+    /* Tabs */
+    #tabs { display: flex; gap: 3px; margin-bottom: 10px; background: rgba(255,255,255,0.04); border-radius: 11px; padding: 3px; border: 1px solid rgba(255,255,255,0.07); width: 100%; max-width: 580px; }
+    .tab { flex: 1; padding: 6px 3px; border-radius: 8px; border: none; background: transparent; color: rgba(240,234,214,0.4); font-family: 'Source Sans 3', sans-serif; font-size: 0.72rem; font-weight: 500; cursor: pointer; transition: all 0.18s; }
+    .tab.active { background: rgba(255,255,255,0.12); color: #F0EAD6; font-weight: 700; }
+
+    /* Suggestions */
+    #suggestions { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 7px; width: 100%; max-width: 580px; }
+    .sugg { display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.09); border-radius: 10px; padding: 9px 12px; color: #F0EAD6; font-family: 'Source Sans 3', sans-serif; font-size: 0.8rem; cursor: pointer; text-align: left; transition: all 0.18s; }
+    .sugg:hover { background: rgba(245,166,35,0.12); border-color: rgba(245,166,35,0.4); transform: translateY(-2px); }
+    .sugg-emoji { font-size: 17px; flex-shrink: 0; }
+
+    /* Messages */
+    .msg-row { display: flex; align-items: flex-end; gap: 8px; margin-bottom: 12px; animation: fadeIn 0.28s ease-out; }
+    .msg-row.user { justify-content: flex-end; }
+    .msg-row.bot { justify-content: flex-start; }
+    .bot-avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #27AE60, #1ABC9C); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; box-shadow: 0 2px 12px rgba(39,174,96,0.4); }
+    .user-avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #C0392B, #96281B); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: #F0EAD6; flex-shrink: 0; }
+    .bubble { max-width: 74%; padding: 11px 15px; border-radius: 18px; font-size: 0.9rem; line-height: 1.65; white-space: pre-wrap; word-break: break-word; }
+    .bubble.user { background: linear-gradient(135deg, #C0392B, #96281B); color: #F0EAD6; border-bottom-right-radius: 4px; box-shadow: 0 4px 16px rgba(192,57,43,0.4); }
+    .bubble.bot { background: rgba(255,255,255,0.08); color: #F0EAD6; border-bottom-left-radius: 4px; border: 1px solid rgba(255,255,255,0.09); }
+
+    /* Typing */
+    #typing { display: none; align-items: flex-end; gap: 8px; margin-bottom: 12px; }
+    #typing-bubble { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.09); border-radius: 18px; border-bottom-left-radius: 4px; padding: 12px 16px; display: flex; gap: 5px; align-items: center; }
+    .dot { width: 7px; height: 7px; border-radius: 50%; background: #F5A623; animation: bounce 1.2s infinite; }
+    .dot:nth-child(2) { animation-delay: 0.18s; }
+    .dot:nth-child(3) { animation-delay: 0.36s; }
+
+    /* Input */
+    #input-area { border-top: 1px solid rgba(255,255,255,0.07); background: rgba(10,22,40,0.9); backdrop-filter: blur(24px); padding: 12px 14px; flex-shrink: 0; }
+    #input-row { display: flex; gap: 8px; align-items: flex-end; max-width: 780px; margin: 0 auto; }
+    #input-wrap { flex: 1; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.11); border-radius: 16px; padding: 10px 14px; cursor: text; }
+    #msg-input { width: 100%; background: transparent; border: none; outline: none; color: #F0EAD6; font-family: 'Source Sans 3', sans-serif; font-size: 0.9rem; line-height: 1.5; resize: none; max-height: 100px; overflow-y: auto; caret-color: #27AE60; }
+    #msg-input::placeholder { color: rgba(240,234,214,0.3); }
+    #send-btn { width: 44px; height: 44px; border-radius: 50%; border: none; background: rgba(255,255,255,0.08); cursor: not-allowed; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; transition: all 0.2s; }
+    #send-btn.active { background: linear-gradient(135deg, #C0392B, #96281B); cursor: pointer; box-shadow: 0 4px 16px rgba(192,57,43,0.45); }
+    #footer-text { text-align: center; font-size: 0.63rem; color: rgba(240,234,214,0.22); margin-top: 7px; }
+
+    /* Animations */
+    @keyframes floatFrog { 0%,100%{transform:translateY(0) rotate(-3deg)} 50%{transform:translateY(-12px) rotate(3deg)} }
+    @keyframes pulse { 0%,100%{opacity:0.5;transform:scale(1)} 50%{opacity:1;transform:scale(1.25)} }
+    @keyframes scrollFlags { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+    @keyframes bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-6px)} }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+  </style>
+</head>
+<body>
+<div id="app">
+
+  <!-- Header -->
+  <header id="header">
+    <div id="logo">
+      <div id="frog-icon">🐸</div>
+      <div>
+        <div id="title">Chat<span>Coquí</span></div>
+        <div id="subtitle" data-es="Tu IA Hispana · Boricua de corazón" data-en="Your Hispanic AI · Boricua at heart">Tu IA Hispana · Boricua de corazón</div>
+      </div>
+    </div>
+    <div id="controls">
+      <button id="clear-btn" onclick="clearChat()">Nueva conversación</button>
+      <button id="lang-btn" onclick="toggleLang()">🇺🇸 English</button>
+      <div id="online">
+        <div id="online-dot"></div>
+        <span id="online-text" data-es="En línea" data-en="Online">En línea</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Flag strip -->
+  <div id="flags">
+    <div id="flags-inner">
+      <span>🇵🇷</span><span>🇲🇽</span><span>🇩🇴</span><span>🇨🇴</span><span>🇨🇺</span><span>🇻🇪</span><span>🇦🇷</span><span>🇵🇪</span><span>🇨🇱</span><span>🇸🇻</span><span>🇬🇹</span><span>🇪🇨</span><span>🇧🇴</span><span>🇺🇾</span><span>🇵🇦</span><span>🇳🇮</span><span>🇭🇳</span><span>🇨🇷</span><span>🇵🇾</span><span>🇪🇸</span>
+      <span>🇵🇷</span><span>🇲🇽</span><span>🇩🇴</span><span>🇨🇴</span><span>🇨🇺</span><span>🇻🇪</span><span>🇦🇷</span><span>🇵🇪</span><span>🇨🇱</span><span>🇸🇻</span><span>🇬🇹</span><span>🇪🇨</span><span>🇧🇴</span><span>🇺🇾</span><span>🇵🇦</span><span>🇳🇮</span><span>🇭🇳</span><span>🇨🇷</span><span>🇵🇾</span><span>🇪🇸</span>
+    </div>
+  </div>
+
+  <!-- Chat -->
+  <div id="chat">
+    <div id="welcome">
+      <div id="welcome-frog">🐸</div>
+      <h2>¡Bienvenido a <span>ChatCoquí</span>!</h2>
+      <p id="greeting">¡Wepa! ¿Qué lo qué? ¿En qué te puedo ayudar hoy? 🐸</p>
+      <p id="tagline">Tu asistente inteligente para toda la comunidad hispana, con el alma boricua siempre presente.</p>
+      <div id="tabs">
+        <button class="tab active" onclick="setTab(0)">🇵🇷 Boricua</button>
+        <button class="tab" onclick="setTab(1)">🌎 Hispano</button>
+        <button class="tab" onclick="setTab(2)">🍽️ Comida</button>
+        <button class="tab" onclick="setTab(3)">🎵 Música</button>
+      </div>
+      <div id="suggestions"></div>
+    </div>
+    <div id="typing">
+      <div class="bot-avatar">🐸</div>
+      <div id="typing-bubble">
+        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Input -->
+  <div id="input-area">
+    <div id="input-row">
+      <div id="input-wrap" onclick="document.getElementById('msg-input').focus()">
+        <textarea id="msg-input" rows="1" placeholder="Escribe aquí, pana... 🐸"></textarea>
+      </div>
+      <button id="send-btn" onclick="sendMessage()">🐸</button>
+    </div>
+    <div id="footer-text">Hecho con ❤️ pa' toda la comunidad hispana · Ko-kí ko-kí 🐸</div>
+  </div>
+
+</div>
+
+<script>
+  // ── State ──────────────────────────────────────────────────────────────────
+  let lang = 'es';
+  let messages = [];
+  let loading = false;
+  let activeTab = 0;
+
+  const SUGGESTIONS = {
+    es: [
+      [{e:'🐸',t:'¿Cómo hacer mofongo en casa?'},{e:'🌀',t:'Puerto Rico después del huracán María'},{e:'📖',t:'Cuéntame sobre la historia Taína'},{e:'🥊',t:'Los mejores boxeadores boricuas'},{e:'🏖️',t:'¿Qué visitar en Puerto Rico?'},{e:'🎭',t:'Las tradiciones del vejigante'}],
+      [{e:'🌮',t:'Diferencias entre las cocinas latinas'},{e:'🎉',t:'¿Cómo se celebra una quinceañera?'},{e:'🗣️',t:'Hispanic vs Latino vs Latine — ¿cuál usar?'},{e:'✈️',t:'La experiencia de ser inmigrante hispano'},{e:'⚽',t:'Los mejores futbolistas latinoamericanos'},{e:'📚',t:'Autores hispanos que debo leer'}],
+      [{e:'🐖',t:'Receta de pernil puertorriqueño'},{e:'🫔',t:'¿Cómo hacer tamales mexicanos?'},{e:'🥩',t:'El asado argentino perfecto'},{e:'🫓',t:'Diferencias entre las arepas'},{e:'🍮',t:'Postres típicos de Latinoamérica'},{e:'🥘',t:'¿Qué es el sancocho dominicano?'}],
+      [{e:'🎤',t:'Los mejores álbumes de Bad Bunny'},{e:'💃',t:'Historia de la salsa y la bomba'},{e:'🎸',t:'Artistas de reggaetón que debes conocer'},{e:'🎹',t:'Diferencia entre merengue y bachata'},{e:'🪗',t:'Los grandes del vallenato colombiano'},{e:'🎺',t:'Historia del mariachi mexicano'}],
+    ],
+    en: [
+      [{e:'🐸',t:'How to make mofongo at home?'},{e:'🌀',t:'Puerto Rico after Hurricane María'},{e:'📖',t:'Tell me about Taíno history'},{e:'🥊',t:'Greatest Puerto Rican boxers ever'},{e:'🏖️',t:'Best places to visit in Puerto Rico'},{e:'🎭',t:'What are vejigante traditions?'}],
+      [{e:'🌮',t:'Differences between Latin cuisines'},{e:'🎉',t:'How is a quinceañera celebrated?'},{e:'🗣️',t:'Hispanic vs Latino vs Latine — which to use?'},{e:'✈️',t:'The experience of being a Hispanic immigrant'},{e:'⚽',t:'Greatest Latin American soccer players'},{e:'📚',t:'Hispanic authors I should read'}],
+      [{e:'🐖',t:'Puerto Rican pernil recipe'},{e:'🫔',t:'How to make Mexican tamales?'},{e:'🥩',t:'The perfect Argentine asado'},{e:'🫓',t:'Differences between types of arepas'},{e:'🍮',t:'Classic Latin American desserts'},{e:'🥘',t:'What is Dominican sancocho?'}],
+      [{e:'🎤',t:'Best Bad Bunny albums ranked'},{e:'💃',t:'History of salsa and bomba'},{e:'🎸',t:'Reggaetón artists you need to know'},{e:'🎹',t:'Difference between merengue and bachata'},{e:'🪗',t:'Legends of Colombian vallenato'},{e:'🎺',t:'History of Mexican mariachi'}],
+    ],
+  };
+
+  const SYSTEM_PROMPT = (lang) => `You are ChatCoquí, a bilingual AI assistant made for the entire Hispanic/Latino community, with a special heart for Puerto Rico and the boricua experience.
+
+LANGUAGE: Respond primarily in ${lang === 'es' ? 'Spanish' : 'English'}. Use Spanglish naturally. Mirror the language the user writes in.
+
+PERSONALITY: Warm, proud, witty, familial. Use boricua slang: "wepa!", "ay bendito", "dale", "chévere", "qué lo qué", "pana". Use "ko-kí ko-kí 🐸" occasionally. Welcome ALL Hispanics warmly.
+
+CULTURAL KNOWLEDGE:
+- Puerto Rico (primary): mofongo, pernil, arroz con gandules, pasteles, tostones, lechón, coquito, reggaetón, salsa, bomba, plena, Bad Bunny, Daddy Yankee, Héctor Lavoe, Residente, Taíno heritage, Hurricane María, Old San Juan, El Yunque, Roberto Clemente, Lin-Manuel Miranda, vejigante, parrandas
+- Mexico: tacos, tamales, mariachi, Día de los Muertos, Frida Kahlo
+- Dominican Republic: mangú, merengue, bachata, Juan Luis Guerra
+- Cuba: ropa vieja, son cubano
+- Colombia: bandeja paisa, vallenato, Shakira, Karol G
+- Venezuela: arepas
+- Argentina: asado, tango, Messi
+- Shared: immigration, diaspora, quinceañeras, code-switching, family values
+
+Keep responses conversational and warm. Puerto Rico always gets extra love — it's home 🐸`;
+
+  // ── Language ───────────────────────────────────────────────────────────────
+  function toggleLang() {
+    lang = lang === 'es' ? 'en' : 'es';
+    const btn = document.getElementById('lang-btn');
+    btn.textContent = lang === 'es' ? '🇺🇸 English' : '🇵🇷 Español';
+    document.getElementById('subtitle').textContent = lang === 'es' ? 'Tu IA Hispana · Boricua de corazón' : 'Your Hispanic AI · Boricua at heart';
+    document.getElementById('online-text').textContent = lang === 'es' ? 'En línea' : 'Online';
+    document.getElementById('greeting').textContent = lang === 'es' ? '¡Wepa! ¿Qué lo qué? ¿En qué te puedo ayudar hoy? 🐸' : '¡Wepa! What\'s good? How can I help you today? 🐸';
+    document.getElementById('tagline').textContent = lang === 'es' ? 'Tu asistente inteligente para toda la comunidad hispana, con el alma boricua siempre presente.' : 'Your intelligent assistant for the entire Hispanic community, with a boricua soul always present.';
+    document.getElementById('msg-input').placeholder = lang === 'es' ? 'Escribe aquí, pana... 🐸' : 'Type here, pana... 🐸';
+    document.getElementById('footer-text').textContent = lang === 'es' ? 'Hecho con ❤️ pa\' toda la comunidad hispana · Ko-kí ko-kí 🐸' : 'Made with ❤️ for the Hispanic community · Ko-kí ko-kí 🐸';
+    document.getElementById('clear-btn').textContent = lang === 'es' ? 'Nueva conversación' : 'New conversation';
+    const tabs = document.querySelectorAll('.tab');
+    const tabLabels = lang === 'es' ? ['🇵🇷 Boricua','🌎 Hispano','🍽️ Comida','🎵 Música'] : ['🇵🇷 Boricua','🌎 Hispanic','🍽️ Food','🎵 Music'];
+    tabs.forEach((t, i) => t.textContent = tabLabels[i]);
+    renderSuggestions();
+  }
+
+  // ── Tabs ───────────────────────────────────────────────────────────────────
+  function setTab(i) {
+    activeTab = i;
+    document.querySelectorAll('.tab').forEach((t, idx) => t.classList.toggle('active', idx === i));
+    renderSuggestions();
+  }
+
+  function renderSuggestions() {
+    const container = document.getElementById('suggestions');
+    const items = SUGGESTIONS[lang][activeTab];
+    container.innerHTML = items.map(s => `<button class="sugg" onclick="sendMessage('${s.t.replace(/'/g,"\\'")}')"><span class="sugg-emoji">${s.e}</span><span>${s.t}</span></button>`).join('');
+  }
+
+  // ── Chat ───────────────────────────────────────────────────────────────────
+  function clearChat() {
+    messages = [];
+    const chat = document.getElementById('chat');
+    chat.innerHTML = '';
+    const welcome = createWelcome();
+    chat.appendChild(welcome);
+    document.getElementById('clear-btn').style.display = 'none';
+    renderSuggestions();
+  }
+
+  function createWelcome() {
+    const w = document.getElementById('welcome');
+    if (w) return w;
+    const div = document.createElement('div');
+    div.id = 'welcome';
+    div.innerHTML = document.getElementById('welcome').innerHTML;
+    return div;
+  }
+
+  function appendMessage(role, content) {
+    const welcome = document.getElementById('welcome');
+    if (welcome) welcome.remove();
+
+    const chat = document.getElementById('chat');
+    const typing = document.getElementById('typing');
+
+    const row = document.createElement('div');
+    row.className = `msg-row ${role}`;
+
+    if (role === 'bot') {
+      row.innerHTML = `<div class="bot-avatar">🐸</div><div class="bubble bot">${content}</div>`;
+    } else {
+      row.innerHTML = `<div class="bubble user">${content}</div><div class="user-avatar">Tú</div>`;
+    }
+
+    chat.insertBefore(row, typing);
+    chat.scrollTop = chat.scrollHeight;
+    document.getElementById('clear-btn').style.display = 'block';
+  }
+
+  async function sendMessage(text) {
+    const input = document.getElementById('msg-input');
+    const userText = (text || input.value).trim();
+    if (!userText || loading) return;
+
+    input.value = '';
+    input.style.height = 'auto';
+    updateSendBtn();
+
+    appendMessage('user', userText);
+    messages.push({ role: 'user', content: userText });
+
+    loading = true;
+    document.getElementById('typing').style.display = 'flex';
+    document.getElementById('chat').scrollTop = document.getElementById('chat').scrollHeight;
+
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 1000, system: SYSTEM_PROMPT(lang), messages })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Error');
+      const reply = (data.content || []).map(b => b.text || '').join('') || (lang === 'es' ? 'Ay bendito, tuve un problema. ¡Inténtalo de nuevo!' : 'Ay bendito, I had an issue. Try again, pana!');
+      messages.push({ role: 'assistant', content: reply });
+      appendMessage('bot', reply);
+    } catch {
+      const err = lang === 'es' ? 'Ay bendito, tuve un problema técnico. ¡Inténtalo de nuevo! 🐸' : 'Ay bendito, I had a technical issue. Try again, pana! 🐸';
+      messages.push({ role: 'assistant', content: err });
+      appendMessage('bot', err);
+    } finally {
+      loading = false;
+      document.getElementById('typing').style.display = 'none';
+    }
+  }
+
+  function updateSendBtn() {
+    const btn = document.getElementById('send-btn');
+    const val = document.getElementById('msg-input').value.trim();
+    btn.classList.toggle('active', val.length > 0 && !loading);
+  }
+
+  // ── Input auto-resize ──────────────────────────────────────────────────────
+  document.getElementById('msg-input').addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+    updateSendBtn();
+  });
+
+  document.getElementById('msg-input').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+  });
+
+  // ── Init ───────────────────────────────────────────────────────────────────
+  renderSuggestions();
+</script>
+</body>
+</html>
