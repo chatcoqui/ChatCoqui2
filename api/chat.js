@@ -11,7 +11,7 @@ export default async function handler(req, res) {
     const anthropicRes = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: { "Content-Type": "application/json", "x-api-key": apiKey, "anthropic-version": "2023-06-01" },
-      body: JSON.stringify({ model: model: model || "claude-haiku-4-5-20251001", max_tokens: Math.min(max_tokens || 1000, 2000), system, messages })
+      body: JSON.stringify({ model: model || "claude-haiku-4-5-20251001", max_tokens: Math.min(max_tokens || 1000, 2000), system, messages })
     });
     const data = await anthropicRes.json();
     if (!anthropicRes.ok) return res.status(anthropicRes.status).json({ error: data?.error?.message || "API error" });
